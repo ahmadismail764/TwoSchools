@@ -79,6 +79,26 @@ public static class StudentMappingExtensions
         return totalCredits > 0 ? totalPoints / totalCredits : null;
     }
 
+    public static Student ToEntity(this CreateStudentRequest request)
+    {
+        return new Student
+        {
+            FullName = request.FullName,
+            Email = request.Email,
+            SchoolId = request.SchoolId
+        };
+    }
+
+    public static Student ToEntity(this UpdateStudentRequest request)
+    {
+        return new Student
+        {
+            FullName = request.FullName ?? string.Empty,
+            Email = request.Email ?? string.Empty,
+            SchoolId = request.SchoolId ?? 0
+        };
+    }
+
     private static decimal ConvertToGradePoints(decimal grade)
     {
         return grade switch

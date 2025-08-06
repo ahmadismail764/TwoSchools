@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TwoSchools.App.Services;
-using TwoSchools.Domain.Entities;
+using TwoSchools.DTOs;
+using TwoSchools.Extensions;
 
 namespace TwoSchools.Controllers;
 
@@ -16,12 +17,12 @@ public class StudentController : ControllerBase
     }
 
     [HttpGet("school/{schoolId}")]
-    public async Task<ActionResult<IEnumerable<Student>>> GetStudentsBySchool(int schoolId)
+    public async Task<ActionResult<IEnumerable<StudentResponse>>> GetStudentsBySchool(int schoolId)
     {
         try
         {
             var students = await _studentService.GetStudentsBySchoolAsync(schoolId);
-            return Ok(students);
+            return Ok(students.Select(s => s.ToResponse()));
         }
         catch (ArgumentException ex)
         {
@@ -30,19 +31,22 @@ public class StudentController : ControllerBase
     }
 
     [HttpGet("{id}/enrollments")]
-    public async Task<ActionResult<Student>> GetStudentWithEnrollments(int id)
+    public async Task<ActionResult<StudentDetailResponse>> GetStudentWithEnrollments(int id)
     {
         var student = await _studentService.GetStudentWithEnrollmentsAsync(id);
-        return student == null ? NotFound() : Ok(student);
+        if (student == null)
+            return NotFound();
+        
+        return Ok(student.ToDetailResponse());
     }
 
     [HttpPost]
-    public async Task<ActionResult<Student>> CreateStudent(Student student)
+    public async Task<ActionResult<StudentResponse>> CreateStudent([FromBody] CreateStudentRequest request)
     {
         try
         {
-            var createdStudent = await _studentService.CreateStudentAsync(student);
-            return CreatedAtAction(nameof(GetStudentWithEnrollments), new { id = createdStudent.Id }, createdStudent);
+            var student = await _studentService.CreateStudentAsync(request.ToEntity());
+            return CreatedAtAction(nameof(GetStudentWithEnrollments), new { id = student.Id }, student.ToResponse());
         }
         catch (ArgumentException ex)
         {
