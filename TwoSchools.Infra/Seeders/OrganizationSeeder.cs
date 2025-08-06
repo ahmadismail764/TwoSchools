@@ -3,7 +3,7 @@ using TwoSchools.Domain.Entities;
 using TwoSchools.Infra.Persistence;
 namespace TwoSchools.Infra.Seeders;
 
-internal class OrganizationSeeder // : IOrganizationSeeder
+internal class OrganizationSeeder : IOrganizationSeeder
 {
     private readonly SchoolDBContext _context;
 
@@ -27,7 +27,7 @@ internal class OrganizationSeeder // : IOrganizationSeeder
         Enrollments = context.Enrollments;
     }
 
-    public async Task SeedAsync()
+    public async Task Seed()
     {
         await SeedSchoolsAsync();
         await SeedSchoolYearsAsync();
