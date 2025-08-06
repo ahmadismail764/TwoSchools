@@ -9,7 +9,7 @@ public class Student
     public School School { get; set; } = null!;
 
     // Navigation properties
-    public List<Subject> Subjects { get; set; } = new();
+    public List<Enrollment> Enrollments { get; set; } = new();
 
     // For JWT role-based access control
     public string Role => "Student";

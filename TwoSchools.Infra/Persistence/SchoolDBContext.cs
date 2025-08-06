@@ -12,14 +12,35 @@ public class SchoolDBContext : DbContext
     public DbSet<SchoolYear> SchoolYears { get; set; }
     public DbSet<Term> Terms { get; set; }
     public DbSet<Subject> Subjects { get; set; }
+    public DbSet<Enrollment> Enrollments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Configure many-to-many relationship between Students and Subjects
-        modelBuilder.Entity<Student>()
-            .HasMany(s => s.Subjects)
-            .WithMany(sub => sub.Students)
-            .UsingEntity(j => j.ToTable("StudentSubjects"));
+        // Configure Enrollment relationships
+        modelBuilder.Entity<Enrollment>()
+            .HasOne(e => e.Student)
+            .WithMany(s => s.Enrollments)
+            .HasForeignKey(e => e.StudentId);
+
+        modelBuilder.Entity<Enrollment>()
+            .HasOne(e => e.Subject)
+            .WithMany(sub => sub.Enrollments)
+            .HasForeignKey(e => e.SubjectId);
+
+        modelBuilder.Entity<Enrollment>()
+            .HasOne(e => e.Term)
+            .WithMany(t => t.Enrollments)
+            .HasForeignKey(e => e.TermId);
+
+        modelBuilder.Entity<Enrollment>()
+            .HasOne(e => e.Teacher)
+            .WithMany(t => t.Enrollments)
+            .HasForeignKey(e => e.TeacherId);
+
+        // Configure unique constraint for Student-Subject-Term enrollment
+        modelBuilder.Entity<Enrollment>()
+            .HasIndex(e => new { e.StudentId, e.SubjectId, e.TermId })
+            .IsUnique();
 
         // Configure Student-School relationship
         modelBuilder.Entity<Student>()
@@ -32,18 +53,6 @@ public class SchoolDBContext : DbContext
             .HasOne(t => t.School)
             .WithMany(sc => sc.Teachers)
             .HasForeignKey(t => t.SchoolId);
-
-        // Configure Subject-Teacher relationship
-        modelBuilder.Entity<Subject>()
-            .HasOne(sub => sub.Teacher)
-            .WithMany(t => t.Subjects)
-            .HasForeignKey(sub => sub.TeacherId);
-
-        // Configure Subject-Term relationship
-        modelBuilder.Entity<Subject>()
-            .HasOne(sub => sub.Term)
-            .WithMany(term => term.Subjects)
-            .HasForeignKey(sub => sub.TermId);
 
         // Configure Term-SchoolYear relationship
         modelBuilder.Entity<Term>()

@@ -13,6 +13,7 @@ internal class OrganizationSeeder // : IOrganizationSeeder
     internal DbSet<Subject> Subjects { get; set; }
     internal DbSet<Teacher> Teachers { get; set; }
     internal DbSet<Term> Terms { get; set; }
+    internal DbSet<Enrollment> Enrollments { get; set; }
 
     public OrganizationSeeder(SchoolDBContext context)
     {
@@ -23,6 +24,7 @@ internal class OrganizationSeeder // : IOrganizationSeeder
         Subjects = context.Subjects;
         Teachers = context.Teachers;
         Terms = context.Terms;
+        Enrollments = context.Enrollments;
     }
 
     public async Task SeedAsync()
@@ -117,16 +119,35 @@ internal class OrganizationSeeder // : IOrganizationSeeder
     {
         if (!await Subjects.AnyAsync())
         {
+            // Seed term-agnostic subjects
             var subjects = new List<Subject>
             {
-                new Subject { Id = 1, Name = "Algebra I", Code = "MATH101", TermId = 1, TeacherId = 1 },
-                new Subject { Id = 2, Name = "English Literature", Code = "ENG201", TermId = 1, TeacherId = 2 },
-                new Subject { Id = 3, Name = "Chemistry", Code = "SCI301", TermId = 2, TeacherId = 1 },
-                new Subject { Id = 4, Name = "Elementary Math", Code = "MATH001", TermId = 1, TeacherId = 3 },
-                new Subject { Id = 5, Name = "Reading Fundamentals", Code = "ENG001", TermId = 1, TeacherId = 4 }
+                new Subject { Id = 1, Name = "Algebra I", Code = "MATH101", Description = "Introduction to Algebra", Credits = 3 },
+                new Subject { Id = 2, Name = "English Literature", Code = "ENG201", Description = "Classical Literature Study", Credits = 3 },
+                new Subject { Id = 3, Name = "Chemistry", Code = "SCI301", Description = "Basic Chemistry Principles", Credits = 4 },
+                new Subject { Id = 4, Name = "Elementary Math", Code = "MATH001", Description = "Basic Math for Elementary Students", Credits = 2 },
+                new Subject { Id = 5, Name = "Reading Fundamentals", Code = "ENG001", Description = "Basic Reading Skills", Credits = 2 }
             };
 
             await Subjects.AddRangeAsync(subjects);
+
+            // Seed enrollments (linking students, subjects, terms, and teachers)
+            var enrollments = new List<Enrollment>
+            {
+                // High School enrollments (Term 1 - Fall 2024)
+                new Enrollment { Id = 1, StudentId = 1, SubjectId = 1, TermId = 1, TeacherId = 1, EnrollmentDate = DateTime.UtcNow.AddMonths(-2), IsActive = true },
+                new Enrollment { Id = 2, StudentId = 1, SubjectId = 2, TermId = 1, TeacherId = 2, EnrollmentDate = DateTime.UtcNow.AddMonths(-2), IsActive = true },
+                new Enrollment { Id = 3, StudentId = 2, SubjectId = 1, TermId = 1, TeacherId = 1, EnrollmentDate = DateTime.UtcNow.AddMonths(-2), IsActive = true },
+                new Enrollment { Id = 4, StudentId = 2, SubjectId = 3, TermId = 2, TeacherId = 1, EnrollmentDate = DateTime.UtcNow.AddMonths(-1), IsActive = true },
+                
+                // Elementary School enrollments (Term 1 - Fall 2024)
+                new Enrollment { Id = 5, StudentId = 3, SubjectId = 4, TermId = 1, TeacherId = 3, EnrollmentDate = DateTime.UtcNow.AddMonths(-2), IsActive = true },
+                new Enrollment { Id = 6, StudentId = 3, SubjectId = 5, TermId = 1, TeacherId = 4, EnrollmentDate = DateTime.UtcNow.AddMonths(-2), IsActive = true },
+                new Enrollment { Id = 7, StudentId = 4, SubjectId = 4, TermId = 1, TeacherId = 3, EnrollmentDate = DateTime.UtcNow.AddMonths(-2), IsActive = true },
+                new Enrollment { Id = 8, StudentId = 4, SubjectId = 5, TermId = 1, TeacherId = 4, EnrollmentDate = DateTime.UtcNow.AddMonths(-2), IsActive = true },
+            };
+
+            await _context.Enrollments.AddRangeAsync(enrollments);
         }
     }
 }

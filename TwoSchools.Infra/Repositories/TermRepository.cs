@@ -23,17 +23,24 @@ public class TermRepository : BaseRepository<Term>, ITermRepository
         var currentDate = DateTime.Now;
         return await _context.Terms
             .Include(t => t.SchoolYear)
-            .Include(t => t.Subjects)
+            .Include(t => t.Enrollments)
+                .ThenInclude(e => e.Subject)
+            .Include(t => t.Enrollments)
+                .ThenInclude(e => e.Student)
+            .Include(t => t.Enrollments)
+                .ThenInclude(e => e.Teacher)
             .FirstOrDefaultAsync(t => t.StartDate <= currentDate && t.EndDate >= currentDate);
     }
 
     public async Task<Term?> GetTermWithSubjectsAsync(int termId)
     {
         return await _context.Terms
-            .Include(t => t.Subjects)
-                .ThenInclude(s => s.Teacher)
-            .Include(t => t.Subjects)
-                .ThenInclude(s => s.Students)
+            .Include(t => t.Enrollments)
+                .ThenInclude(e => e.Subject)
+            .Include(t => t.Enrollments)
+                .ThenInclude(e => e.Teacher)
+            .Include(t => t.Enrollments)
+                .ThenInclude(e => e.Student)
             .Include(t => t.SchoolYear)
             .FirstOrDefaultAsync(t => t.Id == termId);
     }
@@ -41,8 +48,12 @@ public class TermRepository : BaseRepository<Term>, ITermRepository
     public async Task<IEnumerable<Term>> GetTermsWithSubjectsAsync()
     {
         return await _context.Terms
-            .Include(t => t.Subjects)
-                .ThenInclude(s => s.Teacher)
+            .Include(t => t.Enrollments)
+                .ThenInclude(e => e.Subject)
+            .Include(t => t.Enrollments)
+                .ThenInclude(e => e.Teacher)
+            .Include(t => t.Enrollments)
+                .ThenInclude(e => e.Student)
             .Include(t => t.SchoolYear)
             .OrderBy(t => t.StartDate)
             .ToListAsync();
@@ -50,10 +61,14 @@ public class TermRepository : BaseRepository<Term>, ITermRepository
 
     public async Task<IEnumerable<Subject>> GetSubjectsByTermAsync(int termId)
     {
-        return await _context.Subjects
-            .Where(s => s.TermId == termId)
-            .Include(s => s.Teacher)
-            .Include(s => s.Students)
+        return await _context.Enrollments
+            .Where(e => e.TermId == termId)
+            .Select(e => e.Subject)
+            .Distinct()
+            .Include(s => s.Enrollments)
+                .ThenInclude(e => e.Teacher)
+            .Include(s => s.Enrollments)
+                .ThenInclude(e => e.Student)
             .ToListAsync();
     }
 
@@ -61,6 +76,12 @@ public class TermRepository : BaseRepository<Term>, ITermRepository
     {
         return await _context.Terms
             .Include(t => t.SchoolYear)
+            .Include(t => t.Enrollments)
+                .ThenInclude(e => e.Subject)
+            .Include(t => t.Enrollments)
+                .ThenInclude(e => e.Student)
+            .Include(t => t.Enrollments)
+                .ThenInclude(e => e.Teacher)
             .FirstOrDefaultAsync(t => t.Name == name);
     }
 }

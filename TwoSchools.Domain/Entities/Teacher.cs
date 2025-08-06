@@ -8,8 +8,8 @@ public class Teacher
     public int SchoolId { get; set; }
     public School School { get; set; } = null!;
 
-    // Navigation properties - FIX: Add = new();
-    public List<Subject> Subjects { get; set; } = new();
+    // Navigation properties
+    public List<Enrollment> Enrollments { get; set; } = new(); // Teaching assignments
 
     // For JWT role-based access control
     public string Role => "Teacher";

@@ -21,7 +21,8 @@ public class SchoolYearRepository : BaseRepository<SchoolYear>, ISchoolYearRepos
     {
         return await _context.SchoolYears
             .Include(sy => sy.Terms)
-                .ThenInclude(t => t.Subjects)
+                .ThenInclude(t => t.Enrollments)
+                    .ThenInclude(e => e.Subject)
             .FirstOrDefaultAsync(sy => sy.Id == schoolYearId);
     }
 
@@ -44,7 +45,8 @@ public class SchoolYearRepository : BaseRepository<SchoolYear>, ISchoolYearRepos
     {
         return await _context.Terms
             .Where(t => t.SchoolYearId == schoolYearId)
-            .Include(t => t.Subjects)
+            .Include(t => t.Enrollments)
+                .ThenInclude(e => e.Subject)
             .OrderBy(t => t.StartDate)
             .ToListAsync();
     }

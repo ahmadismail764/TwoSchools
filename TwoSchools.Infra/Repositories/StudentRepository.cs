@@ -17,22 +17,26 @@ public class StudentRepository : BaseRepository<Student>, IStudentRepository
             .ToListAsync();
     }
 
-    public async Task<Student?> GetStudentWithSubjectsAsync(int studentId)
+    public async Task<Student?> GetStudentWithEnrollmentsAsync(int studentId)
     {
         return await _context.Students
-            .Include(s => s.Subjects)
-                .ThenInclude(sub => sub.Term)
-            .Include(s => s.Subjects)
-                .ThenInclude(sub => sub.Teacher)
+            .Include(s => s.Enrollments)
+                .ThenInclude(e => e.Subject)
+            .Include(s => s.Enrollments)
+                .ThenInclude(e => e.Term)
+            .Include(s => s.Enrollments)
+                .ThenInclude(e => e.Teacher)
             .Include(s => s.School)
             .FirstOrDefaultAsync(s => s.Id == studentId);
     }
 
-    public async Task<IEnumerable<Student>> GetStudentsWithSubjectsAsync()
+    public async Task<IEnumerable<Student>> GetStudentsWithEnrollmentsAsync()
     {
         return await _context.Students
-            .Include(s => s.Subjects)
-                .ThenInclude(sub => sub.Term)
+            .Include(s => s.Enrollments)
+                .ThenInclude(e => e.Subject)
+            .Include(s => s.Enrollments)
+                .ThenInclude(e => e.Term)
             .Include(s => s.School)
             .ToListAsync();
     }
@@ -44,20 +48,20 @@ public class StudentRepository : BaseRepository<Student>, IStudentRepository
             .FirstOrDefaultAsync(s => s.Email == email);
     }
 
-    public async Task<IEnumerable<Subject>> GetSubjectsByStudentAsync(int studentId)
+    public async Task<IEnumerable<Enrollment>> GetEnrollmentsByStudentAsync(int studentId)
     {
-        return await _context.Students
-            .Where(s => s.Id == studentId)
-            .SelectMany(s => s.Subjects)
-            .Include(sub => sub.Term)
-            .Include(sub => sub.Teacher)
+        return await _context.Enrollments
+            .Where(e => e.StudentId == studentId)
+            .Include(e => e.Subject)
+            .Include(e => e.Term)
+            .Include(e => e.Teacher)
             .ToListAsync();
     }
 
     public async Task<IEnumerable<Student>> GetStudentsBySubjectAsync(int subjectId)
     {
         return await _context.Students
-            .Where(s => s.Subjects.Any(sub => sub.Id == subjectId))
+            .Where(s => s.Enrollments.Any(e => e.SubjectId == subjectId && e.IsActive))
             .Include(s => s.School)
             .ToListAsync();
     }

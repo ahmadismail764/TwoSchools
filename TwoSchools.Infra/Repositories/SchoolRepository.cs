@@ -35,7 +35,8 @@ public class SchoolRepository : BaseRepository<School>, ISchoolRepository
     {
         return await _context.Teachers
             .Where(t => t.SchoolId == schoolId)
-            .Include(t => t.Subjects)
+            .Include(t => t.Enrollments)
+                .ThenInclude(e => e.Subject)
             .ToListAsync();
     }
 
@@ -43,7 +44,8 @@ public class SchoolRepository : BaseRepository<School>, ISchoolRepository
     {
         return await _context.Students
             .Where(s => s.SchoolId == schoolId)
-            .Include(s => s.Subjects)
+            .Include(s => s.Enrollments)
+                .ThenInclude(e => e.Subject)
             .ToListAsync();
     }
 }

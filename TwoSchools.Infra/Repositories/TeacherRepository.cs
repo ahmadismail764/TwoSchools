@@ -20,8 +20,10 @@ public class TeacherRepository : BaseRepository<Teacher>, ITeacherRepository
     public async Task<Teacher?> GetTeacherWithSubjectsAsync(int teacherId)
     {
         return await _context.Teachers
-            .Include(t => t.Subjects)
-                .ThenInclude(s => s.Term)
+            .Include(t => t.Enrollments)
+                .ThenInclude(e => e.Subject)
+            .Include(t => t.Enrollments)
+                .ThenInclude(e => e.Term)
             .Include(t => t.School)
             .FirstOrDefaultAsync(t => t.Id == teacherId);
     }
@@ -29,8 +31,10 @@ public class TeacherRepository : BaseRepository<Teacher>, ITeacherRepository
     public async Task<IEnumerable<Teacher>> GetTeachersWithSubjectsAsync()
     {
         return await _context.Teachers
-            .Include(t => t.Subjects)
-                .ThenInclude(s => s.Term)
+            .Include(t => t.Enrollments)
+                .ThenInclude(e => e.Subject)
+            .Include(t => t.Enrollments)
+                .ThenInclude(e => e.Term)
             .Include(t => t.School)
             .ToListAsync();
     }
@@ -44,10 +48,14 @@ public class TeacherRepository : BaseRepository<Teacher>, ITeacherRepository
 
     public async Task<IEnumerable<Subject>> GetSubjectsByTeacherAsync(int teacherId)
     {
-        return await _context.Subjects
-            .Where(s => s.TeacherId == teacherId)
-            .Include(s => s.Term)
-            .Include(s => s.Students)
+        return await _context.Enrollments
+            .Where(e => e.TeacherId == teacherId)
+            .Select(e => e.Subject)
+            .Distinct()
+            .Include(s => s.Enrollments)
+                .ThenInclude(e => e.Term)
+            .Include(s => s.Enrollments)
+                .ThenInclude(e => e.Student)
             .ToListAsync();
     }
 }

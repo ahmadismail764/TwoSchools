@@ -5,9 +5,9 @@ public class Subject
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Code { get; set; } = string.Empty; // e.g., "MATH101"
-    public int TermId { get; set; }
-    public Term Term { get; set; } = null!;
-    public int TeacherId { get; set; }
-    public Teacher Teacher { get; set; } = null!;
-    public List<Student> Students { get; set; } = new(); // Many-to-many
+    public string Description { get; set; } = string.Empty; // Optional subject description
+    public int Credits { get; set; } = 3; // Credit hours
+    
+    // Navigation properties
+    public List<Enrollment> Enrollments { get; set; } = new(); // Many offerings through Enrollment
 }

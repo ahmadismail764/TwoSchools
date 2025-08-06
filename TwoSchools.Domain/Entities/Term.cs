@@ -8,5 +8,7 @@ public class Term
     public DateTime EndDate { get; set; }
     public int SchoolYearId { get; set; }
     public SchoolYear SchoolYear { get; set; } = null!;
-    public List<Subject> Subjects { get; set; } = new();
+    
+    // Navigation properties
+    public List<Enrollment> Enrollments { get; set; } = new(); // Subject offerings in this term
 }
