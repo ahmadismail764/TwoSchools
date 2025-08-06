@@ -1,4 +1,4 @@
-﻿using TwoSchools.Domain.Entities;
+﻿namespace TwoSchools.Domain.Entities;
 
 public class Teacher
 {

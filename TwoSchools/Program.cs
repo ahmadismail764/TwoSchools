@@ -1,35 +1,25 @@
-using Microsoft.EntityFrameworkCore;
-using TwoSchools.Domain.Repositories;
-using TwoSchools.Infra.Persistence;
-using TwoSchools.Infra.Repositories;
-using TwoSchools.App.Services;
+using TwoSchools.Infra.Extensions;
+using TwoSchools.App.Extensions;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+// Configure JSON serialization to handle circular references
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.WriteIndented = true;
+    });
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Add DbContext
-builder.Services.AddDbContext<SchoolDBContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("TwoSchoolsDB")));
+// Add Infrastructure Layer (Database, Repositories, Seeders)
+builder.Services.AddInfrastructureServices(builder.Configuration);
 
-// Register Repositories
-builder.Services.AddScoped<ISchoolRepository, SchoolRepository>();
-builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
-builder.Services.AddScoped<IStudentRepository, StudentRepository>();
-builder.Services.AddScoped<ISubjectRepository, SubjectRepository>();
-builder.Services.AddScoped<ISchoolYearRepository, SchoolYearRepository>();
-builder.Services.AddScoped<ITermRepository, TermRepository>();
-builder.Services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
-
-// Register Services
-builder.Services.AddScoped<EnrollmentService>();
-builder.Services.AddScoped<StudentService>();
-builder.Services.AddScoped<SubjectService>();
-builder.Services.AddScoped<SchoolService>();
-builder.Services.AddScoped<TeacherService>();
-builder.Services.AddScoped<TermService>();
+// Add Application Layer (Services)
+builder.Services.AddApplicationServices();
 
 var app = builder.Build();
 
@@ -37,6 +27,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    await app.Services.SeedDatabaseAsync();
 }
 
 app.UseHttpsRedirection();

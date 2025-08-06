@@ -35,7 +35,7 @@ internal class OrganizationSeeder : IOrganizationSeeder
         await SeedTeachersAsync();
         await SeedStudentsAsync();
         await SeedSubjectsAsync();
-        await _context.SaveChangesAsync();
+        // Note: Enrollments are seeded within SeedSubjectsAsync() after all other entities exist
     }
 
     private async Task SeedSchoolsAsync()
@@ -44,11 +44,26 @@ internal class OrganizationSeeder : IOrganizationSeeder
         {
             var schools = new List<School>
             {
-                new School { Id = 1, Name = "Lincoln High School", Address = "123 Main St", City = "Springfield", State = "IL" },
-                new School { Id = 2, Name = "Washington Elementary", Address = "456 Oak Ave", City = "Springfield", State = "IL" }
+                new School 
+                { 
+                    Name = "Lincoln High School", 
+                    Address = "123 Main St, Springfield, IL 62701",
+                    PhoneNumber = "+1-217-555-0123",
+                    Email = "admin@lincolnhigh.edu",
+                    Website = "https://lincolnhigh.edu"
+                },
+                new School 
+                { 
+                    Name = "Washington Elementary", 
+                    Address = "456 Oak Ave, Springfield, IL 62702",
+                    PhoneNumber = "+1-217-555-0456",
+                    Email = "office@washington.edu",
+                    Website = "https://washington.edu"
+                }
             };
 
             await Schools.AddRangeAsync(schools);
+            await _context.SaveChangesAsync(); // Save to get auto-generated IDs
         }
     }
 
@@ -56,13 +71,28 @@ internal class OrganizationSeeder : IOrganizationSeeder
     {
         if (!await SchoolYears.AnyAsync())
         {
+            var school1 = await Schools.FirstAsync(s => s.Name == "Lincoln High School");
+            
             var schoolYears = new List<SchoolYear>
             {
-                new SchoolYear { Id = 1, Name = "2024-2025", StartDate = new DateTime(2024, 8, 15), EndDate = new DateTime(2025, 6, 15) },
-                new SchoolYear { Id = 2, Name = "2025-2026", StartDate = new DateTime(2025, 8, 15), EndDate = new DateTime(2026, 6, 15) }
+                new SchoolYear 
+                { 
+                    Year = 2024, 
+                    StartDate = new DateTime(2024, 8, 15), 
+                    EndDate = new DateTime(2025, 6, 15),
+                    SchoolId = school1.Id
+                },
+                new SchoolYear
+                {
+                    Year = 2025,
+                    StartDate = new DateTime(2025, 8, 15),
+                    EndDate = new DateTime(2026, 6, 15),
+                    SchoolId = school1.Id
+                }
             };
 
             await SchoolYears.AddRangeAsync(schoolYears);
+            await _context.SaveChangesAsync(); // Save to get auto-generated IDs
         }
     }
 
@@ -70,15 +100,19 @@ internal class OrganizationSeeder : IOrganizationSeeder
     {
         if (!await Terms.AnyAsync())
         {
+            var schoolYear2024 = await SchoolYears.FirstAsync(sy => sy.Year == 2024);
+            var schoolYear2025 = await SchoolYears.FirstAsync(sy => sy.Year == 2025);
+            
             var terms = new List<Term>
             {
-                new Term { Id = 1, Name = "Fall 2024", StartDate = new DateTime(2024, 8, 15), EndDate = new DateTime(2024, 12, 20), SchoolYearId = 1 },
-                new Term { Id = 2, Name = "Spring 2025", StartDate = new DateTime(2025, 1, 15), EndDate = new DateTime(2025, 6, 15), SchoolYearId = 1 },
-                new Term { Id = 3, Name = "Fall 2025", StartDate = new DateTime(2025, 8, 15), EndDate = new DateTime(2025, 12, 20), SchoolYearId = 2 },
-                new Term { Id = 4, Name = "Spring 2026", StartDate = new DateTime(2026, 1, 15), EndDate = new DateTime(2026, 6, 15), SchoolYearId = 2 }
+                new Term { Name = "Fall 2024", StartDate = new DateTime(2024, 8, 15), EndDate = new DateTime(2024, 12, 20), SchoolYearId = schoolYear2024.Id },
+                new Term { Name = "Spring 2025", StartDate = new DateTime(2025, 1, 15), EndDate = new DateTime(2025, 6, 15), SchoolYearId = schoolYear2024.Id },
+                new Term { Name = "Fall 2025", StartDate = new DateTime(2025, 8, 15), EndDate = new DateTime(2025, 12, 20), SchoolYearId = schoolYear2025.Id },
+                new Term { Name = "Spring 2026", StartDate = new DateTime(2026, 1, 15), EndDate = new DateTime(2026, 6, 15), SchoolYearId = schoolYear2025.Id }
             };
 
             await Terms.AddRangeAsync(terms);
+            await _context.SaveChangesAsync(); // Save to get auto-generated IDs
         }
     }
 
@@ -86,15 +120,19 @@ internal class OrganizationSeeder : IOrganizationSeeder
     {
         if (!await Teachers.AnyAsync())
         {
+            var school1 = await Schools.FirstAsync(s => s.Name == "Lincoln High School");
+            var school2 = await Schools.FirstAsync(s => s.Name == "Washington Elementary");
+            
             var teachers = new List<Teacher>
             {
-                new Teacher { Id = 1, FullName = "John Smith", Email = "john.smith@lincoln.edu", SchoolId = 1},
-                new Teacher { Id = 2, FullName = "Jane Doe", Email = "jane.doe@lincoln.edu", SchoolId = 1},
-                new Teacher { Id = 3, FullName = "Bob Johnson", Email = "bob.johnson@washington.edu", SchoolId = 2 },
-                new Teacher { Id = 4, FullName = "Alice Brown", Email = "alice.brown@washington.edu", SchoolId = 2 }
+                new Teacher { FullName = "John Smith", Email = "john.smith@lincoln.edu", SchoolId = school1.Id},
+                new Teacher { FullName = "Jane Doe", Email = "jane.doe@lincoln.edu", SchoolId = school1.Id},
+                new Teacher { FullName = "Bob Johnson", Email = "bob.johnson@washington.edu", SchoolId = school2.Id },
+                new Teacher { FullName = "Alice Brown", Email = "alice.brown@washington.edu", SchoolId = school2.Id }
             };
 
             await Teachers.AddRangeAsync(teachers);
+            await _context.SaveChangesAsync(); // Save to get auto-generated IDs
         }
     }
 
@@ -102,16 +140,20 @@ internal class OrganizationSeeder : IOrganizationSeeder
     {
         if (!await Students.AnyAsync())
         {
+            var school1 = await Schools.FirstAsync(s => s.Name == "Lincoln High School");
+            var school2 = await Schools.FirstAsync(s => s.Name == "Washington Elementary");
+            
             var students = new List<Student>
             {
-                new Student { Id = 1, FullName = "Michael Wilson", Email = "michael.wilson@student.lincoln.edu", SchoolId = 1 },
-                new Student { Id = 2, FullName = "Sarah Davis", Email = "sarah.davis@student.lincoln.edu", SchoolId = 1 },
-                new Student { Id = 3, FullName = "David Miller", Email = "david.miller@student.lincoln.edu", SchoolId = 1 },
-                new Student { Id = 4, FullName = "Emma Garcia", Email = "emma.garcia@student.washington.edu", SchoolId = 2 },
-                new Student { Id = 5, FullName = "James Martinez", Email = "james.martinez@student.washington.edu", SchoolId = 2 }
+                new Student { FullName = "Michael Wilson", Email = "michael.wilson@student.lincoln.edu", SchoolId = school1.Id },
+                new Student { FullName = "Sarah Davis", Email = "sarah.davis@student.lincoln.edu", SchoolId = school1.Id },
+                new Student { FullName = "David Miller", Email = "david.miller@student.lincoln.edu", SchoolId = school1.Id },
+                new Student { FullName = "Emma Garcia", Email = "emma.garcia@student.washington.edu", SchoolId = school2.Id },
+                new Student { FullName = "James Martinez", Email = "james.martinez@student.washington.edu", SchoolId = school2.Id }
             };
 
             await Students.AddRangeAsync(students);
+            await _context.SaveChangesAsync(); // Save to get auto-generated IDs
         }
     }
 
@@ -122,32 +164,70 @@ internal class OrganizationSeeder : IOrganizationSeeder
             // Seed term-agnostic subjects
             var subjects = new List<Subject>
             {
-                new Subject { Id = 1, Name = "Algebra I", Code = "MATH101", Description = "Introduction to Algebra", Credits = 3 },
-                new Subject { Id = 2, Name = "English Literature", Code = "ENG201", Description = "Classical Literature Study", Credits = 3 },
-                new Subject { Id = 3, Name = "Chemistry", Code = "SCI301", Description = "Basic Chemistry Principles", Credits = 4 },
-                new Subject { Id = 4, Name = "Elementary Math", Code = "MATH001", Description = "Basic Math for Elementary Students", Credits = 2 },
-                new Subject { Id = 5, Name = "Reading Fundamentals", Code = "ENG001", Description = "Basic Reading Skills", Credits = 2 }
+                new Subject { Name = "Algebra I", Code = "MATH101", Description = "Introduction to Algebra", Credits = 3 },
+                new Subject { Name = "English Literature", Code = "ENG201", Description = "Classical Literature Study", Credits = 3 },
+                new Subject { Name = "Chemistry", Code = "SCI301", Description = "Basic Chemistry Principles", Credits = 4 },
+                new Subject { Name = "Elementary Math", Code = "MATH001", Description = "Basic Math for Elementary Students", Credits = 2 },
+                new Subject { Name = "Reading Fundamentals", Code = "ENG001", Description = "Basic Reading Skills", Credits = 2 }
             };
 
             await Subjects.AddRangeAsync(subjects);
+            await _context.SaveChangesAsync(); // Save to get auto-generated IDs
 
-            // Seed enrollments (linking students, subjects, terms, and teachers)
-            var enrollments = new List<Enrollment>
-            {
-                // High School enrollments (Term 1 - Fall 2024)
-                new Enrollment { Id = 1, StudentId = 1, SubjectId = 1, TermId = 1, TeacherId = 1, EnrollmentDate = DateTime.UtcNow.AddMonths(-2), IsActive = true },
-                new Enrollment { Id = 2, StudentId = 1, SubjectId = 2, TermId = 1, TeacherId = 2, EnrollmentDate = DateTime.UtcNow.AddMonths(-2), IsActive = true },
-                new Enrollment { Id = 3, StudentId = 2, SubjectId = 1, TermId = 1, TeacherId = 1, EnrollmentDate = DateTime.UtcNow.AddMonths(-2), IsActive = true },
-                new Enrollment { Id = 4, StudentId = 2, SubjectId = 3, TermId = 2, TeacherId = 1, EnrollmentDate = DateTime.UtcNow.AddMonths(-1), IsActive = true },
-                
-                // Elementary School enrollments (Term 1 - Fall 2024)
-                new Enrollment { Id = 5, StudentId = 3, SubjectId = 4, TermId = 1, TeacherId = 3, EnrollmentDate = DateTime.UtcNow.AddMonths(-2), IsActive = true },
-                new Enrollment { Id = 6, StudentId = 3, SubjectId = 5, TermId = 1, TeacherId = 4, EnrollmentDate = DateTime.UtcNow.AddMonths(-2), IsActive = true },
-                new Enrollment { Id = 7, StudentId = 4, SubjectId = 4, TermId = 1, TeacherId = 3, EnrollmentDate = DateTime.UtcNow.AddMonths(-2), IsActive = true },
-                new Enrollment { Id = 8, StudentId = 4, SubjectId = 5, TermId = 1, TeacherId = 4, EnrollmentDate = DateTime.UtcNow.AddMonths(-2), IsActive = true },
-            };
-
-            await _context.Enrollments.AddRangeAsync(enrollments);
+            // Now seed enrollments using the saved entities
+            await SeedEnrollmentsAsync();
         }
+    }
+
+    private async Task SeedEnrollmentsAsync()
+    {
+        // Get all the saved entities with their IDs
+        var students = await Students.ToListAsync();
+        var subjects = await Subjects.ToListAsync();
+        var teachers = await Teachers.ToListAsync();
+        var fallTerm = await Terms.FirstAsync(t => t.Name == "Fall 2024");
+        var springTerm = await Terms.FirstAsync(t => t.Name == "Spring 2025");
+
+        var enrollments = new List<Enrollment>
+        {
+            // High school students (Michael, Sarah, David)
+            new Enrollment {
+                StudentId = students.First(s => s.FullName == "Michael Wilson").Id,
+                SubjectId = subjects.First(s => s.Code == "MATH101").Id,
+                TermId = fallTerm.Id,
+                TeacherId = teachers.First(t => t.FullName == "John Smith").Id,
+                EnrollmentDate = DateTime.UtcNow.AddMonths(-2),
+                IsActive = true
+            },
+            new Enrollment {
+                StudentId = students.First(s => s.FullName == "Sarah Davis").Id,
+                SubjectId = subjects.First(s => s.Code == "ENG201").Id,
+                TermId = fallTerm.Id,
+                TeacherId = teachers.First(t => t.FullName == "Jane Doe").Id,
+                EnrollmentDate = DateTime.UtcNow.AddMonths(-2),
+                IsActive = true
+            },
+            
+            // Elementary students (Emma, James)
+            new Enrollment {
+                StudentId = students.First(s => s.FullName == "Emma Garcia").Id,
+                SubjectId = subjects.First(s => s.Code == "MATH001").Id,
+                TermId = fallTerm.Id,
+                TeacherId = teachers.First(t => t.FullName == "Bob Johnson").Id,
+                EnrollmentDate = DateTime.UtcNow.AddMonths(-2),
+                IsActive = true
+            },
+            new Enrollment {
+                StudentId = students.First(s => s.FullName == "James Martinez").Id,
+                SubjectId = subjects.First(s => s.Code == "ENG001").Id,
+                TermId = fallTerm.Id,
+                TeacherId = teachers.First(t => t.FullName == "Alice Brown").Id,
+                EnrollmentDate = DateTime.UtcNow.AddMonths(-2),
+                IsActive = true
+            }
+        };
+
+        await Enrollments.AddRangeAsync(enrollments);
+        await _context.SaveChangesAsync();
     }
 }

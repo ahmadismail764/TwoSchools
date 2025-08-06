@@ -1,6 +1,266 @@
-@TwoSchools_HostAddress = http://localhost:5289
+@TwoSchools_HostAddress = https://localhost:7289
+@TwoSchools_HostAddress_Http = http://localhost:5289
 
-GET {{TwoSchools_HostAddress}}/weatherforecast/
+### ===== ENROLLMENT ENDPOINTS =====
+
+### 1. Enroll a student
+POST {{TwoSchools_HostAddress}}/api/enrollment
+Content-Type: application/json
+
+{
+  "studentId": 1,
+  "subjectId": 1,
+  "termId": 1,
+  "teacherId": 1
+}
+
+### 2. Get enrollment by ID
+GET {{TwoSchools_HostAddress}}/api/enrollment/1
 Accept: application/json
+
+### 3. Get student enrollments (summary)
+GET {{TwoSchools_HostAddress}}/api/enrollment/student/1
+Accept: application/json
+
+### 4. Update grade
+PUT {{TwoSchools_HostAddress}}/api/enrollment/1/grade
+Content-Type: application/json
+
+{
+  "grade": 87.5
+}
+
+### 5. Withdraw student from subject
+DELETE {{TwoSchools_HostAddress}}/api/enrollment/1/subject/1/term/1
+
+### 6. Get student average grade
+GET {{TwoSchools_HostAddress}}/api/enrollment/student/1/average
+Accept: application/json
+
+### ===== STUDENT ENDPOINTS =====
+
+### 7. Get students by school
+GET {{TwoSchools_HostAddress}}/api/student/school/1
+Accept: application/json
+
+### 8. Create new student
+POST {{TwoSchools_HostAddress}}/api/student
+Content-Type: application/json
+
+{
+  "fullName": "John Doe",
+  "email": "john.doe@email.com",
+  "schoolId": 1
+}
+
+### 9. Get student by ID
+GET {{TwoSchools_HostAddress}}/api/student/1
+Accept: application/json
+
+### 10. Update student
+PUT {{TwoSchools_HostAddress}}/api/student/1
+Content-Type: application/json
+
+{
+  "fullName": "John Updated Doe",
+  "email": "john.updated@email.com",
+  "schoolId": 1
+}
+
+### 11. Delete student
+DELETE {{TwoSchools_HostAddress}}/api/student/1
+
+### ===== SUBJECT ENDPOINTS =====
+
+### 12. Get all subjects
+GET {{TwoSchools_HostAddress}}/api/subject
+Accept: application/json
+
+### 13. Create new subject
+POST {{TwoSchools_HostAddress}}/api/subject
+Content-Type: application/json
+
+{
+  "name": "Advanced Mathematics",
+  "code": "MATH301",
+  "description": "Advanced calculus and linear algebra",
+  "credits": 3
+}
+
+### 14. Get subject by ID
+GET {{TwoSchools_HostAddress}}/api/subject/1
+Accept: application/json
+
+### 15. Update subject
+PUT {{TwoSchools_HostAddress}}/api/subject/1
+Content-Type: application/json
+
+{
+  "name": "Updated Mathematics",
+  "code": "MATH301",
+  "description": "Updated description",
+  "credits": 4
+}
+
+### 16. Delete subject
+DELETE {{TwoSchools_HostAddress}}/api/subject/1
+
+### 17. Get subjects by term
+GET {{TwoSchools_HostAddress}}/api/subject/term/1
+Accept: application/json
+
+### 18. Get subject average grade
+GET {{TwoSchools_HostAddress}}/api/subject/1/average
+Accept: application/json
+
+### ===== SCHOOL ENDPOINTS =====
+
+### 19. Get all schools
+GET {{TwoSchools_HostAddress}}/api/school
+Accept: application/json
+
+### 20. Create new school
+POST {{TwoSchools_HostAddress}}/api/school
+Content-Type: application/json
+
+{
+  "name": "Central High School",
+  "address": "123 Education St, City, State 12345",
+  "phoneNumber": "+1-555-0123",
+  "email": "admin@centralhigh.edu",
+  "website": "https://centralhigh.edu"
+}
+
+### 21. Get school by ID
+GET {{TwoSchools_HostAddress}}/api/school/1
+Accept: application/json
+
+### 22. Update school
+PUT {{TwoSchools_HostAddress}}/api/school/1
+Content-Type: application/json
+
+{
+  "name": "Updated Central High School",
+  "address": "456 Learning Ave, City, State 12345",
+  "phoneNumber": "+1-555-0456",
+  "email": "info@centralhigh.edu",
+  "website": "https://www.centralhigh.edu"
+}
+
+### 23. Delete school
+DELETE {{TwoSchools_HostAddress}}/api/school/1
+
+### 24. Get school students
+GET {{TwoSchools_HostAddress}}/api/school/1/students
+Accept: application/json
+
+### 25. Get school teachers
+GET {{TwoSchools_HostAddress}}/api/school/1/teachers
+Accept: application/json
+
+### ===== TEACHER ENDPOINTS =====
+
+### 26. Get all teachers
+GET {{TwoSchools_HostAddress}}/api/teacher
+Accept: application/json
+
+### 27. Create new teacher
+POST {{TwoSchools_HostAddress}}/api/teacher
+Content-Type: application/json
+
+{
+  "fullName": "Dr. Jane Smith",
+  "email": "jane.smith@school.edu",
+  "schoolId": 1
+}
+
+### 28. Get teacher by ID
+GET {{TwoSchools_HostAddress}}/api/teacher/1
+Accept: application/json
+
+### 29. Update teacher
+PUT {{TwoSchools_HostAddress}}/api/teacher/1
+Content-Type: application/json
+
+{
+  "fullName": "Dr. Jane Updated Smith",
+  "email": "jane.updated@school.edu",
+  "schoolId": 1
+}
+
+### 30. Delete teacher
+DELETE {{TwoSchools_HostAddress}}/api/teacher/1
+
+### 31. Get teachers by school
+GET {{TwoSchools_HostAddress}}/api/teacher/school/1
+Accept: application/json
+
+### 32. Get teacher enrollments (classes)
+GET {{TwoSchools_HostAddress}}/api/teacher/1/enrollments
+Accept: application/json
+
+### 33. Get teacher average grade
+GET {{TwoSchools_HostAddress}}/api/teacher/1/average
+Accept: application/json
+
+### ===== TERM ENDPOINTS =====
+
+### 34. Get all terms
+GET {{TwoSchools_HostAddress}}/api/term
+Accept: application/json
+
+### 35. Get current term
+GET {{TwoSchools_HostAddress}}/api/term/current
+Accept: application/json
+
+### 36. Create new term
+POST {{TwoSchools_HostAddress}}/api/term
+Content-Type: application/json
+
+{
+  "name": "Fall 2024",
+  "startDate": "2024-09-01T00:00:00",
+  "endDate": "2024-12-15T23:59:59",
+  "schoolYearId": 1
+}
+
+### 37. Get term by ID
+GET {{TwoSchools_HostAddress}}/api/term/1
+Accept: application/json
+
+### 38. Update term
+PUT {{TwoSchools_HostAddress}}/api/term/1
+Content-Type: application/json
+
+{
+  "name": "Updated Fall 2024",
+  "startDate": "2024-09-01T00:00:00",
+  "endDate": "2024-12-20T23:59:59",
+  "schoolYearId": 1
+}
+
+### 39. Delete term
+DELETE {{TwoSchools_HostAddress}}/api/term/1
+
+### 40. Get terms by school year
+GET {{TwoSchools_HostAddress}}/api/term/schoolyear/1
+Accept: application/json
+
+### 41. Get active terms
+GET {{TwoSchools_HostAddress}}/api/term/active
+Accept: application/json
+
+### 42. Get upcoming terms
+GET {{TwoSchools_HostAddress}}/api/term/upcoming
+Accept: application/json
+
+### ===== HEALTH CHECK & INFO =====
+
+### 43. API Health Check
+GET {{TwoSchools_HostAddress}}/api/health
+Accept: application/json
+
+### 44. Swagger Documentation
+GET {{TwoSchools_HostAddress}}/swagger/index.html
 
 ###

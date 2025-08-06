@@ -3,8 +3,12 @@
 public class SchoolYear
 {
     public int Id { get; set; }
-    public string Name { get; set; } = string.Empty; // e.g., "2024-2025"
+    public int Year { get; set; } // e.g., 2024
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
+    public int SchoolId { get; set; }
+    public School School { get; set; } = null!;
+    
+    // Navigation properties
     public List<Term> Terms { get; set; } = new();
 }

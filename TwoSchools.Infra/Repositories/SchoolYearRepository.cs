@@ -30,15 +30,9 @@ public class SchoolYearRepository : BaseRepository<SchoolYear>, ISchoolYearRepos
     {
         return await _context.SchoolYears
             .Include(sy => sy.Terms)
+            .Include(sy => sy.School)
             .OrderByDescending(sy => sy.StartDate)
             .ToListAsync();
-    }
-
-    public async Task<SchoolYear?> GetSchoolYearByNameAsync(string name)
-    {
-        return await _context.SchoolYears
-            .Include(sy => sy.Terms)
-            .FirstOrDefaultAsync(sy => sy.Name == name);
     }
 
     public async Task<IEnumerable<Term>> GetTermsBySchoolYearAsync(int schoolYearId)

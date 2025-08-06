@@ -122,3 +122,100 @@ public class TermResponse
     public int ActiveEnrollments { get; set; }
     public bool IsActive { get; set; }
 }
+
+// === TEACHER REQUEST DTOs ===
+public class CreateTeacherRequest
+{
+    [Required]
+    [MaxLength(100)]
+    public string FullName { get; set; } = string.Empty;
+
+    [Required]
+    [EmailAddress]
+    [MaxLength(200)]
+    public string Email { get; set; } = string.Empty;
+
+    [Required]
+    public int SchoolId { get; set; }
+}
+
+public class UpdateTeacherRequest
+{
+    [Required]
+    [MaxLength(100)]
+    public string FullName { get; set; } = string.Empty;
+
+    [Required]
+    [EmailAddress]
+    [MaxLength(200)]
+    public string Email { get; set; } = string.Empty;
+
+    [Required]
+    public int SchoolId { get; set; }
+}
+
+// === TERM REQUEST DTOs ===
+public class CreateTermRequest
+{
+    [Required]
+    [MaxLength(50)]
+    public string Name { get; set; } = string.Empty;
+
+    [Required]
+    public DateTime StartDate { get; set; }
+
+    [Required]
+    public DateTime EndDate { get; set; }
+
+    [Required]
+    public int SchoolYearId { get; set; }
+}
+
+public class UpdateTermRequest
+{
+    [Required]
+    [MaxLength(50)]
+    public string Name { get; set; } = string.Empty;
+
+    [Required]
+    public DateTime StartDate { get; set; }
+
+    [Required]
+    public DateTime EndDate { get; set; }
+
+    [Required]
+    public int SchoolYearId { get; set; }
+}
+
+// === SCHOOL YEAR REQUEST DTOs ===
+public class CreateSchoolYearRequest
+{
+    [Required]
+    [Range(2020, 2030, ErrorMessage = "Year must be between 2020 and 2030")]
+    public int Year { get; set; }
+
+    [Required]
+    public DateTime StartDate { get; set; }
+
+    [Required]
+    public DateTime EndDate { get; set; }
+
+    [Required]
+    public int SchoolId { get; set; }
+}
+
+public class UpdateSchoolYearRequest
+{
+    [Required]
+    [Range(2020, 2030, ErrorMessage = "Year must be between 2020 and 2030")]
+    public int Year { get; set; }
+
+    [Required]
+    public DateTime StartDate { get; set; }
+
+    [Required]
+    public DateTime EndDate { get; set; }
+
+    [Required]
+    public int SchoolId { get; set; }
+}
